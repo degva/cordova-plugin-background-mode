@@ -100,11 +100,9 @@ public class ForegroundService extends Service {
         String ticker = settings.optString("ticker", "");
         Boolean resume = settings.optBoolean("resume");
         
-        String mess = settings.optString("littleMess", "got nothing");
         final int min = Integer.parseInt(settings.optString("minutes", "217"));
         
         Log.i("keepAwake", "this is the min: " + min);
-        Log.i("degva", mess);
 
         // startForeground(NOTIFICATION_ID, makeNotification());
         
