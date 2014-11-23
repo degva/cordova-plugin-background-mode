@@ -45,8 +45,10 @@ channel.deviceready.subscribe(function () {
 exports.getDefaults = function () {
     return {
         title:  'App is running in background',
-        text:   'Doing heavy tasks.',
+        text:   'Doing heavy tsdfsdf',
         ticker: 'App is running in background',
+				minutes: '10',
+				littleMess: 'This works!',
         resume: true
     };
 };

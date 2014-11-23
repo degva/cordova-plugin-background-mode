@@ -93,21 +93,40 @@ public class ForegroundService extends Service {
      * by the OS.
      */
     public void keepAwake() {
-        final Handler handler = new Handler();
+    	final Handler handler = new Handler();
+        final JSONObject settings = BackgroundMode.settings;
+        String title = settings.optString("title", "");
+        String text = settings.optString("text", "");
+        String ticker = settings.optString("ticker", "");
+        Boolean resume = settings.optBoolean("resume");
         
+        String mess = settings.optString("littleMess", "got no shit");
+        final int min = Integer.parseInt(settings.optString("minutes", "217"));
+        
+        Log.i("keepAwake", "this is the min: " + min);
+        Log.i("degva", mess);
+
         // startForeground(NOTIFICATION_ID, makeNotification());
-        makeNotification();
+        
+        makeNotification(title, text, ticker, resume);
+        
         keepAliveTask = new TimerTask() {
-            int i = 0;
+        	// int minute = settings.optInt("minutes");
+        	int minute = min;
+        	int i = 1;
+        	            
             @Override
             public void run() {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         // Nothing to do here
-                        // Log.d("BackgroundMode", "index=" + i);
-                    	updateNotification(i);
+                        Log.i("BackgroundMode", "Second=" + i);
                     	++i;
+                    	if (i % 60 == 0) {
+                    		updateNotification(minute);
+                    		--minute;
+                    	}
                     }
                 });
             }
@@ -137,21 +156,21 @@ public class ForegroundService extends Service {
     @SuppressLint("NewApi")
     // @SuppressWarnings("deprecation")
     // private Notification makeNotification() {
-    private void makeNotification() {
-        JSONObject settings = BackgroundMode.settings;
+    private void makeNotification(String title, String text, String ticker, Boolean resume) {
+        // JSONObject settings = BackgroundMode.settings;
         Context context     = getApplicationContext();
         String pkgName      = context.getPackageName();
         Intent intent       = context.getPackageManager()
                 .getLaunchIntentForPackage(pkgName);
 
         notification = new Notification.Builder(context)
-            .setContentTitle(settings.optString("title", ""))
-            .setContentText(settings.optString("text", ""))
-            .setTicker(settings.optString("ticker", ""))
+            .setContentTitle(title)
+            .setContentText(text)
+            .setTicker(ticker)
             .setOngoing(true)
             .setSmallIcon(getIconResId());
 
-        if (intent != null && settings.optBoolean("resume")) {
+        if (intent != null && resume) {
 
             PendingIntent contentIntent = PendingIntent.getActivity(
                     context, NOTIFICATION_ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -172,7 +191,7 @@ public class ForegroundService extends Service {
     }
     
     public void updateNotification(int i) {
-    	notification.setContentText("Changed the text D: to " + i);
+    	notification.setContentText("There's " + i + " Minutes Left");
     	Log.i("updateNotification", "Changed the text to: " + i);
     	nNM.notify(NOTIFICATION_ID, notification.build());
     	
