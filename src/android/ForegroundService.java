@@ -96,7 +96,7 @@ public class ForegroundService extends Service {
     	final Handler handler = new Handler();
         final JSONObject settings = BackgroundMode.settings;
         String title = settings.optString("title", "");
-        String text = settings.optString("text", "");
+        // String text = settings.optString("text", "");
         String ticker = settings.optString("ticker", "");
         Boolean resume = settings.optBoolean("resume");
         
@@ -106,7 +106,7 @@ public class ForegroundService extends Service {
 
         // startForeground(NOTIFICATION_ID, makeNotification());
         
-        makeNotification(title, text, ticker, resume);
+        makeNotification(title, min, ticker, resume);
         
         keepAliveTask = new TimerTask() {
         	// int minute = settings.optInt("minutes");
@@ -122,8 +122,8 @@ public class ForegroundService extends Service {
                         Log.i("BackgroundMode", "Second=" + i);
                     	++i;
                     	if (i % 60 == 0) {
-                    		updateNotification(minute);
                     		--minute;
+                    		updateNotification(minute);
                     	}
                     }
                 });
@@ -154,7 +154,7 @@ public class ForegroundService extends Service {
     @SuppressLint("NewApi")
     // @SuppressWarnings("deprecation")
     // private Notification makeNotification() {
-    private void makeNotification(String title, String text, String ticker, Boolean resume) {
+    private void makeNotification(String title, int min, String ticker, Boolean resume) {
         // JSONObject settings = BackgroundMode.settings;
         Context context     = getApplicationContext();
         String pkgName      = context.getPackageName();
@@ -163,7 +163,7 @@ public class ForegroundService extends Service {
 
         notification = new Notification.Builder(context)
             .setContentTitle(title)
-            .setContentText(text)
+            .setContentText("There's " + min + " min left")
             .setTicker(ticker)
             .setOngoing(true)
             .setSmallIcon(getIconResId());

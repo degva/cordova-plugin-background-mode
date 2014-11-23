@@ -47,7 +47,7 @@ exports.getDefaults = function () {
         title:  'App is running in background',
         text:   'Doing heavy tsdfsdf',
         ticker: 'App is running in background',
-				minutes: '10',
+				seconds: '10',
         resume: true
     };
 };
