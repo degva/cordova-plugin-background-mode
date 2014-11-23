@@ -48,7 +48,6 @@ exports.getDefaults = function () {
         text:   'Doing heavy tsdfsdf',
         ticker: 'App is running in background',
 				minutes: '10',
-				littleMess: 'This works!',
         resume: true
     };
 };
