@@ -100,18 +100,18 @@ public class ForegroundService extends Service {
         String ticker = settings.optString("ticker", "");
         Boolean resume = settings.optBoolean("resume");
         
-        final int min = Integer.parseInt(settings.optString("minutes", "217"));
+        final int secs = Integer.parseInt(settings.optString("seconds", "217"));
         
-        Log.i("keepAwake", "this is the min: " + min);
+        Log.i("keepAwake", "this is the min: " + secs);
 
         // startForeground(NOTIFICATION_ID, makeNotification());
-        
+        final int min = secs / 60;
         makeNotification(title, min, ticker, resume);
         
         keepAliveTask = new TimerTask() {
         	// int minute = settings.optInt("minutes");
         	int minute = min;
-        	int i = 1;
+        	int i = secs;
         	            
             @Override
             public void run() {
@@ -120,7 +120,7 @@ public class ForegroundService extends Service {
                     public void run() {
                         // Nothing to do here
                         Log.i("BackgroundMode", "Second=" + i);
-                    	++i;
+                    	--i;
                     	if (i % 60 == 0) {
                     		--minute;
                     		updateNotification(minute);
