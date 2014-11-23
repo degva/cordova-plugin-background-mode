@@ -28,14 +28,22 @@ import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.os.Build;
+//import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+
+
+import android.util.Log;
+/*
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
+*/
 
 /**
  * Puts the service in a foreground state, where the system considers it to be
@@ -52,6 +60,8 @@ public class ForegroundService extends Service {
 
     // Used to keep the app alive
     TimerTask keepAliveTask;
+    NotificationManager nNM;
+    Notification.Builder notification;
 
     /**
      * Allow clients to call on to the service.
@@ -68,6 +78,7 @@ public class ForegroundService extends Service {
     @Override
     public void onCreate () {
         super.onCreate();
+        nNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         keepAwake();
     }
 
@@ -83,17 +94,20 @@ public class ForegroundService extends Service {
      */
     public void keepAwake() {
         final Handler handler = new Handler();
-
-        startForeground(NOTIFICATION_ID, makeNotification());
-
+        
+        // startForeground(NOTIFICATION_ID, makeNotification());
+        makeNotification();
         keepAliveTask = new TimerTask() {
+            int i = 0;
             @Override
             public void run() {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         // Nothing to do here
-                        // Log.d("BackgroundMode", "" + new Date().getTime());
+                        // Log.d("BackgroundMode", "index=" + i);
+                    	updateNotification(i);
+                    	++i;
                     }
                 });
             }
@@ -106,8 +120,10 @@ public class ForegroundService extends Service {
      * Stop background mode.
      */
     private void sleepWell() {
-        stopForeground(true);
+        // stopForeground(true);
         keepAliveTask.cancel();
+        Log.i("sleepWell", "Destroying the Notification");
+        nNM.cancel(NOTIFICATION_ID);
     }
 
     /**
@@ -119,15 +135,16 @@ public class ForegroundService extends Service {
      *      main activity.
      */
     @SuppressLint("NewApi")
-    @SuppressWarnings("deprecation")
-    private Notification makeNotification() {
+    // @SuppressWarnings("deprecation")
+    // private Notification makeNotification() {
+    private void makeNotification() {
         JSONObject settings = BackgroundMode.settings;
         Context context     = getApplicationContext();
         String pkgName      = context.getPackageName();
         Intent intent       = context.getPackageManager()
                 .getLaunchIntentForPackage(pkgName);
 
-        Notification.Builder notification = new Notification.Builder(context)
+        notification = new Notification.Builder(context)
             .setContentTitle(settings.optString("title", ""))
             .setContentText(settings.optString("text", ""))
             .setTicker(settings.optString("ticker", ""))
@@ -141,7 +158,7 @@ public class ForegroundService extends Service {
 
             notification.setContentIntent(contentIntent);
         }
-
+        /*
         if (Build.VERSION.SDK_INT < 16) {
             // Build notification for HoneyComb to ICS
             return notification.getNotification();
@@ -149,8 +166,18 @@ public class ForegroundService extends Service {
             // Notification for Jellybean and above
             return notification.build();
         }
+        */
+        Log.i("makeNotification", "Doing the Notification! :D");
+        nNM.notify(NOTIFICATION_ID, notification.build());
     }
-
+    
+    public void updateNotification(int i) {
+    	notification.setContentText("Changed the text D: to " + i);
+    	Log.i("updateNotification", "Changed the text to: " + i);
+    	nNM.notify(NOTIFICATION_ID, notification.build());
+    	
+    }
+    
     /**
      * Retrieves the resource ID of the app icon.
      *
