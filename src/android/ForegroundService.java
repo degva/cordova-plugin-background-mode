@@ -100,7 +100,7 @@ public class ForegroundService extends Service {
         String ticker = settings.optString("ticker", "");
         Boolean resume = settings.optBoolean("resume");
         
-        final int secs = Integer.parseInt(settings.optString("seconds", "217"));
+        final int secs = Integer.parseInt(settings.optString("seconds", "0"));
         
         Log.i("keepAwake", "this is the min: " + secs);
 
